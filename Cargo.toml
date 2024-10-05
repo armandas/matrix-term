@@ -1,0 +1,9 @@
+[package]
+name = "matrix-term"
+version = "0.1.0"
+edition = "2021"
+authors = ["Armandas Jarušauskas <jarusauskas@gmail.com>"]
+
+[dependencies]
+crossterm = "0.28.1"
+rand = "0.8.5"
