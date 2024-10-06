@@ -12,17 +12,19 @@ pub struct Matrix {
     width: usize,
     height: usize,
     buffer: Vec<Vec<Option<Cell>>>,
+    spawn_count: usize,
     max_age: u16,
 }
 
 impl Matrix {
-    pub fn new(width: usize, height: usize, max_age: u16) -> Self {
+    pub fn new(width: usize, height: usize, spawn_count: usize, max_age: u16) -> Self {
         Self {
             rng: thread_rng(),
             stdout: std::io::stdout(),
             width: width / 2,
             height,
             buffer: vec![vec![Option::<Cell>::None; width]; height],
+            spawn_count,
             max_age,
         }
     }
@@ -73,21 +75,27 @@ impl Matrix {
     }
 
     fn spawn_parents(&mut self) {
-        let spawn_col = self.buffer[0]
+        let mut spawn_col = self.buffer[0]
             .iter()
             .enumerate()
             .filter(|(_, cell)| cell.is_none())
-            .choose(&mut self.rng)
-            .unwrap_or_else(|| {
+            .map(|(i, _)| i)
+            .choose_multiple(&mut self.rng, self.spawn_count);
+
+        if spawn_col.len() < self.spawn_count {
+            spawn_col.extend(
                 self.buffer[0]
                     .iter()
                     .enumerate()
-                    .filter(|(_, cell)| cell.unwrap().age == self.max_age)
-                    .choose(&mut self.rng)
-                    .unwrap()
-            })
-            .0;
-        self.buffer[0][spawn_col] = Some(Cell::new(&mut self.rng));
+                    .filter(|(_, cell)| cell.is_some() && cell.unwrap().age == self.max_age)
+                    .map(|(i, _)| i)
+                    .choose_multiple(&mut self.rng, self.spawn_count - spawn_col.len()),
+            );
+        }
+
+        for col in spawn_col {
+            self.buffer[0][col] = Some(Cell::new(&mut self.rng));
+        }
     }
 
     fn spawn_children(&mut self) {

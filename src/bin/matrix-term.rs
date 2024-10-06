@@ -6,7 +6,7 @@ fn main() -> std::io::Result<()> {
     terminal::enable_raw_mode()?;
 
     let size = crossterm::terminal::size()?;
-    let mut matrix = Matrix::new(size.0 as usize, size.1 as usize, 20);
+    let mut matrix = Matrix::new(size.0 as usize, size.1 as usize, 4, 20);
 
     matrix.begin()?;
 
