@@ -15,13 +15,10 @@ fn main() -> std::io::Result<()> {
         matrix.render()?;
 
         if let Ok(true) = event::poll(Duration::from_millis(100)) {
-            match event::read()? {
-                event::Event::Key(event) => {
-                    if event.code == event::KeyCode::Char('q') {
-                        break;
-                    }
+            if let event::Event::Key(event) = event::read()? {
+                if event.code == event::KeyCode::Char('q') {
+                    break;
                 }
-                _ => (),
             };
         }
     }
