@@ -49,12 +49,8 @@ impl Matrix {
         for y in 0..self.height {
             for x in 0..self.width {
                 if let Some(cell) = self.buffer[y][x] {
-                    let c = (255.0
-                        * (1.0 - ((self.max_age - cell.age) as f32 / self.max_age as f32)))
-                        as u8;
-                    let styled =
-                        format!("{}", cell.content).with(style::Color::Rgb { r: c, g: c, b: c });
-                    print!("{}", styled);
+                    let color = self.get_color(cell.age);
+                    print!("{}", cell.content.with(color));
                 } else {
                     print!("  ");
                 }
@@ -108,6 +104,16 @@ impl Matrix {
                 }
             }
         }
+    }
+
+    fn get_color(&self, age: u16) -> style::Color {
+        let c = if age == 0 {
+            0
+        } else {
+            100 + (128.0 * (1.0 - ((self.max_age - age) as f32 / self.max_age as f32))) as u8
+        };
+
+        style::Color::Rgb { r: c, g: c, b: c }
     }
 }
 
